@@ -1,29 +1,23 @@
 <?php
-include 'minic.php';
+define('BASE_PATH', __DIR__);
 define('DS', DIRECTORY_SEPARATOR);
 
-$app = Minic::setup([
-    'base_dir' => __DIR__,
-    'template_dir' => __DIR__ . DS . 'templates',
-    'base_url' => '/',
-    'static_url' => '/static',
-    'page_title' => 'My Simple App'
-]);
+include 'bootstrap.php';
+use App\Bootstrap;
 
-$app
-    ->route('GET', '/', function ($app, $params) {
-        $app->render('home', ['message' => 'Welcome to php-minic!']);
-    })
-    ->route('GET', '/about', function ($app, $params) {
-        $app->render('about', ['page_title' => 'About Us']);
-    })
-    ->route('GET', '/api/json', function ($app, $params) {
-        $app->response_json(['status' => 'success', 'data' => 'Hello, JSON!']);
-    })
-    ->route('POST', '/submit', function ($app, $params) {
-        $app->response_text("Form submitted successfully!");
-    })
-    ->route('GET', '*', function ($app, $params) {
-        $app->response_404("Page Not Found");
-    })
-    ->dispatch();
+Bootstrap::setup([
+    "site_title" => "Huynh AT's minic framework",
+    "view_dir" => "./views",
+    "hooks" => [
+        "before_dispatch" => function (Bootstrap $app) {
+            
+        },
+        "after_bootstrap_construct" => function (Bootstrap $app) {
+            
+        }
+    ]
+])->get('/', function(Bootstrap $app) {
+    $app->render('home.php', [
+        'message' => 'Hello world'
+    ]);
+})->runApp();
