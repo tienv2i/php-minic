@@ -1,13 +1,18 @@
 <?php
-define('BASE_PATH', __DIR__);
-define('DS', DIRECTORY_SEPARATOR);
 
-include 'bootstrap.php';
+define('DS', DIRECTORY_SEPARATOR);
+define('BASE_PATH', realpath(__DIR__.DS.'..'));
+
+include '../bootstrap.php';
 use App\Bootstrap;
 
 Bootstrap::setup([
-    "site_title" => "Huynh AT's minic framework",
-    "view_dir" => "./views",
+    "view_defaults" => [
+        "site_title" => "Huynh AT's minic framework",
+        "base_url" => "/",
+        "static_url" => "/public/static"
+    ],
+    "view_dir" => BASE_PATH.DS."views",
     "hooks" => [
         "before_dispatch" => function (Bootstrap $app) {
             

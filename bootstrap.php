@@ -3,7 +3,7 @@ namespace App;
 
 class Bootstrap {
     private static ?Bootstrap $instance = null;
-    private array $config = ["hooks" => []], /* $path_segments = [], */ $routes = [];
+    private array $config = ["hooks" => [], "view_defaults" => []], $path_segments = [], $routes = [];
     private string $path, $uri;
 
     public function __construct() {
@@ -17,7 +17,7 @@ class Bootstrap {
         else $path = $uri;
         
         $this->path = $path ?: '/';
-        // $this->path_segments = array_filter(explode('/', $this->path));
+        $this->path_segments = array_filter(explode('/', $this->path));
     }
     
     public static function setup(array $config = []): self {
@@ -96,6 +96,8 @@ class Bootstrap {
         if (!file_exists($viewPath)) {
             throw new \Exception("View file not found: $viewPath");
         }
+        
+        $data = array_merge($this->config['view_defaults'], $data);
         extract($data);
         require $viewPath;
     }
@@ -125,6 +127,7 @@ class Bootstrap {
             echo "<p><pre>Property '$name' does not exist.</pre></p>";
         }
     }
+
     public function get_config(string $name, $default = '') {
         return $this->config[$name] ?? $default;
     }

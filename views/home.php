@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="<?=$static_url?>/bootstrap.min.css">
-    <title><?=$this->get_config('site_title', 'Home Page')?></title>
+    <title><?=$site_title ?? 'Homepage'?></title>
 </head>
 <body>
     <h1>Welcome to php-minic!</h1>
