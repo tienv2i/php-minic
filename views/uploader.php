@@ -1,3 +1,4 @@
+<?php if (!defined('BASE_PATH')) die('Access denied!'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
