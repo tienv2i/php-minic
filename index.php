@@ -11,23 +11,20 @@ use Minic\Core\Config;
 
 Config::initialize([
     'app_name'   => 'My App',
-    'base_url'   => 'http://localhost/myapp',
+    'base_url'   => 'http://localhost:8000',
+    'static_url' => '/static',
     'twig_cache' => false, 
     'twig_debug' => true,  
+    'twig_helpers' => [
+        'site_url' => 'site_url',  
+        'static_url' => 'static_url', 
+        'asset' => 'asset_url',    
+        'session_get' => 'session_get',
+        'view_ext' => '.twig',
+    ],
+    'views_dir' => __DIR__ . '/src/views',
+    'helpers_dir' => __DIR__ . '/src/helpers'
 ]);
-
-Config::set('twig_helpers', [
-    'base_url' => 'base_url',  
-    'asset' => 'asset_url',    
-    'session_get' => 'session_get',
-    'view_ext' => '.twig',
-]);
-
-Config::set('views_dir', __DIR__ . '/src/views');
-Config::set('twig_cache', false);
-Config::set('twig_debug', true);
-Config::set('app_name', 'My Mini Framework');
-Config::set('base_url', 'http://localhost/myapp');
 
 Bootstrap::getInstance()->runApp();
 

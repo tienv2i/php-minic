@@ -22,7 +22,7 @@ class Bootstrap extends Singleton {
      * Load global PHP helpers (not tied to Twig).
      */
     private function loadHelpers(): void {
-        $helpersDir = Config::get('helpers_dir', dirname(__DIR__, 2) . '/helpers');
+        $helpersDir = Config::get('helpers_dir', dirname(__DIR__, 2) . '/src/helpers');
 
         if (!is_dir($helpersDir)) {
             return;

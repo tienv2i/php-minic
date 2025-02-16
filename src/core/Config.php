@@ -46,6 +46,7 @@ class Config extends Singleton {
      */
     public static function get(string $key, $default = "") {
         return self::getInstance()->data[$key] ?? $default;
+
     }
 
     /**

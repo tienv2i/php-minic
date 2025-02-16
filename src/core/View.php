@@ -57,8 +57,9 @@ class View extends Singleton {
      */
     private function setTwigHelpers(): void {
         $twigHelpers = Config::get('twig_helpers', []);
-
+        
         foreach ($twigHelpers as $name => $function) {
+
             if (function_exists($function)) {
                 $this->twig->addFunction(new TwigFunction($name, $function));
             }
