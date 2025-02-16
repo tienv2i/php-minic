@@ -61,4 +61,5 @@ class Config extends Singleton {
         }
         $instance->data[$key] = $value; // Allow overwriting existing values
     }
+
 }

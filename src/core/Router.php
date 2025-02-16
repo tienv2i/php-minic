@@ -1,7 +1,5 @@
 <?php
-namespace Minic\Core\Http;
-
-use Minic\Core\Singleton;
+namespace Minic\Core;
 
 class Router extends Singleton{
     

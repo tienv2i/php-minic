@@ -2,9 +2,12 @@
 namespace Minic\Controller;
 use Minic\Core\Controller;
 use Minic\Core\Http\Response;
+use Minic\Core\View;
 
 class Uploader extends Controller {
     public function index () {
-        Response::text('this is uploader page ');
+        View::render('uploader/index', [
+
+        ]);
     }
 }

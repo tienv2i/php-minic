@@ -1,6 +1,5 @@
 <?php
-namespace Minic\Core\Http;
-use Minic\Core\Config;
+namespace Minic\Core;
 
 class Response {
     /**
@@ -73,35 +72,5 @@ class Response {
         
         exit;
     }
-
-    /**
-     * Render a Twig template and send the output as an HTML response.
-     *
-     * @param string $template The Twig template file name (with or without the .twig extension).
-     * @param array  $data     Data to be passed to the template.
-     * @param array  $headers  Additional headers.
-     *
-     * @throws \Exception If the Twig library is not available.
-     */
-    public static function renderTwig(string $template, array $data = [], array $headers = []) {
-        // Determine the views directory from configuration or fallback to default
-        $viewsDir = Config::get('views_dir', __DIR__ . '/../../views');
-        
-        // Ensure the template has the .twig extension
-        if (substr($template, -10) !== '.twig.html') {
-            $template .= '.twig.html';
-        }
-        
-        // Initialize Twig loader and environment
-        $loader = new \Twig\Loader\FilesystemLoader($viewsDir);
-        $twig = new \Twig\Environment($loader, [
-            // Uncomment and set a cache directory if needed
-            // 'cache' => $viewsDir . '/cache',
-            'debug' => true,
-        ]);
-        
-        // Render the template with the provided data
-        $content = $twig->render($template, $data);
-        self::html($content, 200, $headers);
-    }
+   
 }

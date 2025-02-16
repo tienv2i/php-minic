@@ -8,32 +8,26 @@ include 'vendor/autoload.php';
 use Minic\Core\Bootstrap;
 use Minic\Core\Config;
 
-$config = [
-    "view_defaults" => [
-        "site_title" => "Huynh AT's minic framework",
 
-        "static_url" => "/static"
-    ],
-    "base_url" => "/index.php",
-    "view_dir" => BASE_PATH.DS."views",
-    "uploaded_dir" => BASE_PATH.DS."uploaded",
-    "uploaded_url" => "/uploaded",
-    "helper_dir" => BASE_PATH.DS."helpers",
-    "helpers" => [
-        "url",
-        "uploader",
-    ],
-    "hooks" => [
-        "before_dispatch" => function (Bootstrap $app) {
-            
-        },
-        "after_bootstrap_construct" => function (Bootstrap $app) {
-            
-        }
-    ]
-];
+Config::initialize([
+    'app_name'   => 'My App',
+    'base_url'   => 'http://localhost/myapp',
+    'twig_cache' => false, 
+    'twig_debug' => true,  
+]);
 
-Config::initialize($config);
+Config::set('twig_helpers', [
+    'base_url' => 'base_url',  
+    'asset' => 'asset_url',    
+    'session_get' => 'session_get',
+    'view_ext' => '.twig',
+]);
+
+Config::set('views_dir', __DIR__ . '/src/views');
+Config::set('twig_cache', false);
+Config::set('twig_debug', true);
+Config::set('app_name', 'My Mini Framework');
+Config::set('base_url', 'http://localhost/myapp');
 
 Bootstrap::getInstance()->runApp();
 

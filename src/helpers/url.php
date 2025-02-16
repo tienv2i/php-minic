@@ -1,17 +1,10 @@
 <?php
-include_once BASE_PATH.DS."bootstrap.php";
+use Minic\Core\Config;
 
-use App\Bootstrap;
-
-function uploadedFileUrl($file_name) {
-    $base_url = rtrim(getBaseUrl(), '/');
-    return $base_url . '/files/' . urlencode($file_name);
+function base_url(string $path = ''): string {
+    return rtrim(Config::get('base_url', '/'), '/') . '/' . ltrim($path, '/');
 }
 
-function getBaseUrl() {
-    // $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    // $host = $_SERVER['HTTP_HOST'];
-    // return $protocol . '://' . $host;
-    return  Bootstrap::getInstance()->getConfig("base_url") ?? "/";
+function asset_url(string $path = ''): string {
+    return base_url('assets/' . ltrim($path, '/'));
 }
-?>
