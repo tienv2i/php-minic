@@ -1,0 +1,21 @@
+{
+    "name": "huynh-at/php-minic",
+    "description": "PHP Mini Framework",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Minic\\Core\\": "src/core/",
+            "Minic\\Controller\\": "src/controllers/"
+        }
+    },
+    "authors": [
+        {
+            "name": "tienv2i",
+            "email": "tienv2i@gmail.com"
+        }
+    ],
+    "require": {
+        "twig/twig": "*"
+    }
+}
