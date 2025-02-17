@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error 404 - Page not found! </title>
+    <link rel="stylesheet" href="{{ static_url('/bootstrap.min.css') }}">
+</head>
+<body class="bg-light"> 
+    <div class="container bg-white p-4 my-4 border shadow py-auto text-center">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Oops!</h1>
+                <h3 class="mb-3 text-danger">404 - PAGE NOT FOUND</h3>
+                <div class="error-details mb-3">
+                    Sorry, an error has occured, Requested page not found!
+                </div>
+                <a href="{{ base_url }}" class="btn btn-primary">GO HOME</a>
+            </div>
+        </div>
+        
+    </div>
+    <script src="{{ static_url('/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

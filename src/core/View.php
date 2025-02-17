@@ -10,10 +10,14 @@ use Twig\TwigFunction;
  * View Singleton Class for managing Twig rendering.
  */
 class View extends Singleton {
-    private Environment $twig;
-    private array $globalVars = [];
-    private array $defaultData = []; // Store default data
+    protected static Environment $twig;
+    protected static array $globalVars = [];
+    protected static array $defaultData = []; // Store default data
+    protected static array $twigFunctions = []; // Store functions before registering to Twig
 
+    /**
+     * Initialize the Twig environment with configurations.
+     */
     protected function __construct() {
         $this->initializeTwig();
     }
@@ -25,73 +29,151 @@ class View extends Singleton {
         $viewsDir = Config::get('views_dir', dirname(__DIR__, 2) . '/views');
 
         $loader = new FilesystemLoader($viewsDir);
-        $this->twig = new Environment($loader, [
+        self::$twig = new Environment($loader, [
             'cache' => Config::get('twig_cache', false) ? dirname(__DIR__, 2) . '/cache/twig' : false,
             'debug' => Config::get('twig_debug', false),
         ]);
 
         $this->setDefaultVariables();
-        $this->setTwigHelpers();
+        $this->registerTwigFunctions();
     }
 
     /**
      * Set default global variables for Twig templates.
      */
     private function setDefaultVariables(): void {
-        $this->globalVars = [
+        self::$globalVars = [
             'base_url'   => Config::get('base_url', '/'),
             'app_name'   => Config::get('app_name', 'MyApp'),
             'csrf_token' => $_SESSION['csrf_token'] ?? '',
         ];
 
-        foreach ($this->globalVars as $key => $value) {
-            $this->twig->addGlobal($key, $value);
+        foreach (self::$globalVars as $key => $value) {
+            self::$twig->addGlobal($key, $value);
         }
 
-        // Set global variables as default data
-        $this->defaultData = $this->globalVars;
+        self::$defaultData = self::$globalVars;
     }
 
     /**
-     * Register Twig-specific helpers.
+     * Set a global variable for templates.
+     *
+     * @param string|array $key
+     * @param mixed|null $value
      */
-    private function setTwigHelpers(): void {
-        $twigHelpers = Config::get('twig_helpers', []);
-        
-        foreach ($twigHelpers as $name => $function) {
-
-            if (function_exists($function)) {
-                $this->twig->addFunction(new TwigFunction($name, $function));
+    public static function setGlobal(string|array $key, mixed $value = null): void {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                self::setGlobal($k, $v);
             }
+            return;
+        }
+
+        self::$globalVars[$key] = $value;
+        if (isset(self::$twig)) {
+            self::$twig->addGlobal($key, $value);
         }
     }
 
     /**
      * Set a default data variable (can be overridden in render()).
-     * 
+     *
      * @param string $key
      * @param mixed $value
      */
     public static function setData(string $key, mixed $value): void {
-        self::getInstance()->defaultData[$key] = $value;
+        self::$defaultData[$key] = $value;
+    }
+
+    /**
+     * Register a new function to be used inside Twig templates.
+     *
+     * @param string|array $name
+     * @param callable|null $function
+     */
+    public static function registerFunction(string|array $name, callable|null $function = null): void {
+        if (is_array($name)) {
+            foreach ($name as $funcName => $func) {
+                self::registerFunction($funcName, $func);
+            }
+            return;
+        }
+
+        if ($function === null) {
+            throw new \InvalidArgumentException("Function for '{$name}' cannot be null.");
+        }
+
+        if (isset(self::$twigFunctions[$name])) {
+            return;
+        }
+
+        self::$twigFunctions[$name] = $function;
+
+        if (isset(self::$twig)) {
+            self::$twig->addFunction(new TwigFunction($name, $function));
+        }
+    }
+
+    /**
+     * Register all stored functions into Twig.
+     */
+    private function registerTwigFunctions(): void {
+        foreach (self::$twigFunctions as $name => $function) {
+            self::$twig->addFunction(new TwigFunction($name, $function));
+        }
+    }
+
+    /**
+     * Render a Twig template if it exists.
+     *
+     * @param string $template Template file (relative to the views directory).
+     * @param array $data Data to pass to the template.
+     * @param array $headers Response headers.
+     * @throws \RuntimeException if the template does not exist.
+     */
+    public static function renderIfExists(string $template, array $data = [], array $headers = []): void {
+
+        $twig_ext = Config::get('view_ext', '.twig');
+        if (!str_ends_with($template, $twig_ext)) {
+            $template .= $twig_ext;
+        }
+        // Check if the template exists
+        if (self::$twig->getLoader()->exists($template)) {
+            
+            $finalData = array_merge(self::$defaultData, $data);
+            $content = self::$twig->render($template, $finalData);
+            Response::html($content, 200, $headers);
+        } else {
+            // Handle case where template does not exist (optional)
+            // For now, we can return or throw an error, depending on your preference
+            Response::html("Template '{$template}' not found.", 404);
+            return;
+        }
+
     }
 
     /**
      * Render a Twig template.
      *
-     * @param string $template Template file (relative to views directory).
+     * @param string $template Template file (relative to the views directory).
      * @param array $data Data to pass to the template.
+     * @param array $headers Response headers.
+     * @throws \RuntimeException if the template does not exist.
      */
     public static function render(string $template, array $data = [], array $headers = []): void {
+
         $twig_ext = Config::get('view_ext', '.twig');
-        if (strpos($template, $twig_ext, -strlen($twig_ext)) !== 0) {
+        if (!str_ends_with($template, $twig_ext)) {
             $template .= $twig_ext;
         }
 
-        // Merge default data with provided data
-        $finalData = array_merge(self::getInstance()->defaultData, $data);
+        // Ensure the template exists
+        if (!self::$twig->getLoader()->exists($template)) {
+            throw new \RuntimeException("Template '{$template}' not found.");
+        }
 
-        $content = self::getInstance()->twig->render($template, $finalData);
+        $finalData = array_merge(self::$defaultData, $data);
+        $content = self::$twig->render($template, $finalData);
         Response::html($content, 200, $headers);
     }
 
@@ -101,6 +183,15 @@ class View extends Singleton {
      * @return Environment
      */
     public static function getTwig(): Environment {
-        return self::getInstance()->twig;
+        return self::$twig;
+    }
+
+    /**
+     * Reset all global variables, functions, and default data.
+     */
+    public static function reset(): void {
+        self::$globalVars = [];
+        self::$defaultData = [];
+        self::$twigFunctions = [];
     }
 }

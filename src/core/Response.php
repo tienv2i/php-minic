@@ -72,5 +72,23 @@ class Response {
         
         exit;
     }
+
+
+    /**
+     * Send an error response based on error code.
+     *
+     * @param int    $errorCode The error code to respond with (e.g., 404, 500, etc.).
+     * @param array  $data      Additional data to pass to the template.
+     */
+    public static function sendError(int $errorCode, array $data = []): void {
+        // Set the response code to the provided error code
+        http_response_code($errorCode);
+
+        // Get the template name for the given error code from Config
+        $template = Config::get("error_{$errorCode}_template", "{$errorCode}");
+
+        // Render the error page using View::renderIfExists
+        View::renderIfExists($template, $data, ['X-Status' => "$errorCode Error"]);
+    }
    
 }
